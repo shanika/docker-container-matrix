@@ -12,26 +12,26 @@ import java.util.List;
 @Service
 public class DockerServiceImpl implements DockerService {
 
-    private final DockerClient dockerClient;
+	private final DockerClient dockerClient;
 
-    public DockerServiceImpl(DockerClient dockerClient) {
-        this.dockerClient = dockerClient;
-    }
+	public DockerServiceImpl(DockerClient dockerClient) {
+		this.dockerClient = dockerClient;
+	}
 
-    @Override
-    public Version version() throws DockerException, InterruptedException {
-        return dockerClient.version();
-    }
+	@Override
+	public Version version() throws DockerException, InterruptedException {
+		return dockerClient.version();
+	}
 
-    @Override
-    public ContainerStats getContainerStats(String containerId) throws DockerException, InterruptedException {
-        return dockerClient.stats(containerId);
+	@Override
+	public ContainerStats getContainerStats(String containerId) throws DockerException, InterruptedException {
+		return dockerClient.stats(containerId);
 //        ContainerStats containerStats = dockerClient.stats(containerId);
 //        return new DockerStats(containerStats.network(), containerStats.memoryStats(), containerStats.cpuStats());
-    }
+	}
 
-    @Override
-    public List<Container> getContainers() throws DockerException, InterruptedException {
-        return dockerClient.listContainers();
-    }
+	@Override
+	public List<Container> getContainers() throws DockerException, InterruptedException {
+		return dockerClient.listContainers();
+	}
 }
