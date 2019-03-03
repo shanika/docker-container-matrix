@@ -5,11 +5,10 @@ import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.messages.Container;
 import com.spotify.docker.client.messages.ContainerStats;
 import com.spotify.docker.client.messages.Version;
-
-import shanika.dto.DockerStats;
-
 import org.apache.commons.io.FileUtils;
+import org.decimal4j.util.DoubleRounder;
 import org.springframework.stereotype.Service;
+import shanika.dto.DockerStats;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,12 +45,14 @@ public class DockerServiceImpl implements DockerService {
 	}
 
 	private DockerStats getContainerStats(ContainerStats containerStats) {
-		double cpuUsage = containerStats.cpuStats().cpuUsage().totalUsage()
-				/ containerStats.cpuStats().systemCpuUsage();
+		long cpuDelta = containerStats.cpuStats().cpuUsage().totalUsage();
+		long systemDelta = containerStats.cpuStats().systemCpuUsage();
+		int perCPU = containerStats.cpuStats().cpuUsage().percpuUsage().size();
+		double percent = ((double) cpuDelta / (double) systemDelta) * perCPU * 100;
 		String memoryUsage = FileUtils.byteCountToDisplaySize(containerStats.memoryStats().usage());
 		String networkUsage = FileUtils
 				.byteCountToDisplaySize(containerStats.networks().entrySet().iterator().next().getValue().rxBytes());
-		return new DockerStats(cpuUsage, memoryUsage, networkUsage);
+		return new DockerStats(DoubleRounder.round(percent, 2), memoryUsage, networkUsage);
 	}
 
 }
