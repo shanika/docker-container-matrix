@@ -1,11 +1,13 @@
 package shanika.controllers;
 
-import com.spotify.docker.client.exceptions.DockerException;
-import com.spotify.docker.client.messages.ContainerStats;
-import com.spotify.docker.client.messages.Version;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.spotify.docker.client.exceptions.DockerException;
+import com.spotify.docker.client.messages.Version;
+
+import shanika.dto.DockerStats;
 import shanika.service.DockerService;
 
 @RestController
@@ -23,7 +25,7 @@ public class DockerController {
 	}
 
 	@RequestMapping("/stats/{container_id}")
-	public ContainerStats getContainerStats(@PathVariable("container_id") String containerId) {
+	public DockerStats getContainerStats(@PathVariable("container_id") String containerId) {
 		try {
 			return dockerService.getContainerStats(containerId);
 		} catch (DockerException e) {
@@ -33,6 +35,17 @@ public class DockerController {
 		}
 		return null;
 	}
-
+	
+	@RequestMapping("/stats")
+	public DockerStats getContainerStats() {
+		try {
+			return dockerService.getContainerStats();
+		} catch (DockerException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 }

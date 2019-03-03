@@ -1,12 +1,9 @@
 package shanika.service;
 
 import com.spotify.docker.client.exceptions.DockerException;
-import com.spotify.docker.client.messages.Container;
-import com.spotify.docker.client.messages.ContainerStats;
 import com.spotify.docker.client.messages.Version;
-import shanika.dto.DockerStats;
 
-import java.util.List;
+import shanika.dto.DockerStats;
 
 public interface DockerService {
     /**
@@ -26,8 +23,16 @@ public interface DockerService {
      * @throws DockerException
      * @throws InterruptedException
      */
-//    DockerStats getContainerStats(String containerId) throws DockerException, InterruptedException;
-    ContainerStats getContainerStats(String containerId) throws DockerException, InterruptedException;
-
-    List<Container> getContainers() throws DockerException, InterruptedException;
+    DockerStats getContainerStats(String containerId) throws DockerException, InterruptedException;
+    
+    
+    /**
+     * Get All Container Statistics
+     *
+     * @param containerId
+     * @return {@link DockerStats}
+     * @throws DockerException
+     * @throws InterruptedException
+     */
+    DockerStats getContainerStats() throws DockerException, InterruptedException;
 }

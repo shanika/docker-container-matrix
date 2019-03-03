@@ -1,51 +1,52 @@
 package shanika.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.spotify.docker.client.messages.CpuStats;
-import com.spotify.docker.client.messages.MemoryStats;
-import com.spotify.docker.client.messages.NetworkStats;
 
 public class DockerStats {
 
-    @JsonProperty("network")
-    private NetworkStats network;
+	@JsonProperty("cpu_usage")
+	private double cpu_usage;
 
-    @JsonProperty("memory_stats")
-    private MemoryStats memoryStats;
+	@JsonProperty("memory_usage")
+	private String memory_usage;
 
-    @JsonProperty("cpu_stats")
-    private CpuStats cpuStats;
+	@JsonProperty("network_usage")
+	private String network_usage;
 
-    public DockerStats() {
-    }
+	public DockerStats(double cpu_usage, String memory_usage, String network_usage) {
+		this.cpu_usage = cpu_usage;
+		this.memory_usage = memory_usage;
+		this.network_usage = network_usage;
+	}
 
-    public DockerStats(NetworkStats network, MemoryStats memoryStats, CpuStats cpuStats) {
-        this.network = network;
-        this.memoryStats = memoryStats;
-        this.cpuStats = cpuStats;
-    }
+	public double getCpu_usage() {
+		return cpu_usage;
+	}
 
-    public NetworkStats getNetwork() {
-        return network;
-    }
+	public void setCpu_usage(double cpu_usage) {
+		this.cpu_usage = cpu_usage;
+	}
 
-    public void setNetwork(NetworkStats network) {
-        this.network = network;
-    }
+	public String getMemory_usage() {
+		return memory_usage;
+	}
 
-    public MemoryStats getMemoryStats() {
-        return memoryStats;
-    }
+	public void setMemory_usage(String memory_usage) {
+		this.memory_usage = memory_usage;
+	}
 
-    public void setMemoryStats(MemoryStats memoryStats) {
-        this.memoryStats = memoryStats;
-    }
+	public String getNetwork_usage() {
+		return network_usage;
+	}
 
-    public CpuStats getCpuStats() {
-        return cpuStats;
-    }
+	public void setNetwork_usage(String network_usage) {
+		this.network_usage = network_usage;
+	}
 
-    public void setCpuStats(CpuStats cpuStats) {
-        this.cpuStats = cpuStats;
-    }
+	@Override
+	public String toString() {
+		return "DockerStats [cpu_usage=" + cpu_usage + ", memory_usage=" + memory_usage + ", network_usage="
+				+ network_usage + "]";
+	}
+
 }
