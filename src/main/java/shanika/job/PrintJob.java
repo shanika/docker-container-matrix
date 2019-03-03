@@ -1,11 +1,12 @@
 package shanika.job;
 
+import java.util.List;
+
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
-import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
 
 import shanika.dto.DockerStats;
@@ -15,17 +16,15 @@ import shanika.service.DockerService;
 public class PrintJob extends QuartzJobBean {
 
 	private final DockerService dockerService;
-	private final DockerClient dockerClient;
 
-	public PrintJob(DockerService dockerService, DockerClient dockerClient) {
+	public PrintJob(DockerService dockerService) {
 		this.dockerService = dockerService;
-		this.dockerClient = dockerClient;
 	}
 
 	@Override
 	protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
 		try {
-			DockerStats containerStats = dockerService.getContainerStats(this.dockerClient.listContainers().get(0).id());
+			List<DockerStats> containerStats = dockerService.getContainerStats();
 			System.out.println(containerStats);
 		} catch (DockerException e) {
 			e.printStackTrace();

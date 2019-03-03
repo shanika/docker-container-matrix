@@ -11,6 +11,7 @@ import shanika.dto.DockerStats;
 import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -29,22 +30,28 @@ public class DockerServiceImpl implements DockerService {
 
 	@Override
 	public DockerStats getContainerStats(String containerId) throws DockerException, InterruptedException {
-        ContainerStats containerStats = dockerClient.stats(containerId);
-        double cpuUsage = containerStats.cpuStats().cpuUsage().totalUsage() / containerStats.cpuStats().systemCpuUsage();
-        String memoryUsage = FileUtils.byteCountToDisplaySize(containerStats.memoryStats().usage());
-        String networkUsage = FileUtils.byteCountToDisplaySize(containerStats.networks().entrySet().iterator()
-        		.next().getValue().rxBytes());
-        return new DockerStats(cpuUsage, memoryUsage , networkUsage);
+		ContainerStats containerStats = dockerClient.stats(containerId);
+		return getContainerStats(containerStats);
 	}
 
 	@Override
-	public DockerStats getContainerStats() throws DockerException, InterruptedException {
+	public List<DockerStats> getContainerStats() throws DockerException, InterruptedException {
 		List<Container> containers = dockerClient.listContainers();
+		List<DockerStats> dockerStats = new ArrayList<>();
 		for (Container container : containers) {
 			ContainerStats containerStats = dockerClient.stats(container.id());
+			dockerStats.add(getContainerStats(containerStats));
 		}
-		return null;
+		return dockerStats;
 	}
 
+	private DockerStats getContainerStats(ContainerStats containerStats) {
+		double cpuUsage = containerStats.cpuStats().cpuUsage().totalUsage()
+				/ containerStats.cpuStats().systemCpuUsage();
+		String memoryUsage = FileUtils.byteCountToDisplaySize(containerStats.memoryStats().usage());
+		String networkUsage = FileUtils
+				.byteCountToDisplaySize(containerStats.networks().entrySet().iterator().next().getValue().rxBytes());
+		return new DockerStats(cpuUsage, memoryUsage, networkUsage);
+	}
 
 }
