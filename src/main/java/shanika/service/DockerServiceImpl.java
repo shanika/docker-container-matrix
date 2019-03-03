@@ -45,8 +45,11 @@ public class DockerServiceImpl implements DockerService {
 	}
 
 	private DockerStats getContainerStats(ContainerStats containerStats) {
-		long cpuDelta = containerStats.cpuStats().cpuUsage().totalUsage();
-		long systemDelta = containerStats.cpuStats().systemCpuUsage();
+		Long previousCPU = containerStats.precpuStats().cpuUsage().totalUsage();
+		float cpuDelta = (float) containerStats.cpuStats().cpuUsage().totalUsage() - (float) previousCPU;
+
+		Long previousSystem = containerStats.precpuStats().systemCpuUsage();
+		float systemDelta = (float) containerStats.cpuStats().systemCpuUsage() - (float) previousSystem;
 		int perCPU = containerStats.cpuStats().cpuUsage().percpuUsage().size();
 		double percent = ((double) cpuDelta / (double) systemDelta) * perCPU * 100;
 		String memoryUsage = FileUtils.byteCountToDisplaySize(containerStats.memoryStats().usage());
