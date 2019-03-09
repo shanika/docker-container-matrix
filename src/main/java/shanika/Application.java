@@ -9,30 +9,32 @@ import shanika.job.PrintJob;
 @SpringBootApplication
 public class Application {
 
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
 
-	@Bean
-	public JobDetail sampleJobDetail() {
-		return JobBuilder.newJob(PrintJob.class)
-				.withIdentity("printJob")
-				.storeDurably()
-				.build();
-	}
+    @Bean
+    public JobDetail sampleJobDetail() {
+        return JobBuilder.newJob(PrintJob.class)
+                .withIdentity("printJob")
+                .usingJobData(PrintJob.PREV_TOTAL, 0l)
+                .usingJobData(PrintJob.PREV_IDLE, 0l)
+                .storeDurably()
+                .build();
+    }
 
-	@Bean
-	public Trigger sampleJobTrigger() {
-		SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder.simpleSchedule()
-				.withIntervalInSeconds(5)
-				.repeatForever();
+    @Bean
+    public Trigger sampleJobTrigger() {
+        SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder.simpleSchedule()
+                .withIntervalInSeconds(1)
+                .repeatForever();
 
-		return TriggerBuilder
-				.newTrigger()
-				.forJob(sampleJobDetail())
-				.withIdentity("printTrigger")
-				.withSchedule(scheduleBuilder)
-				.build();
-	}
+        return TriggerBuilder
+                .newTrigger()
+                .forJob(sampleJobDetail())
+                .withIdentity("printTrigger")
+                .withSchedule(scheduleBuilder)
+                .build();
+    }
 
 }
