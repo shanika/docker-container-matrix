@@ -11,7 +11,7 @@ public class DockerStats {
     private double cpu_usage;
 
     @JsonProperty("network_usage")
-    private String network_usage;
+    private long network_usage;
 
     public DockerStats() {
     }
@@ -32,11 +32,11 @@ public class DockerStats {
         this.cpu_usage = cpu_usage;
     }
 
-    public String getNetwork_usage() {
+    public long getNetwork_usage() {
         return network_usage;
     }
 
-    public void setNetwork_usage(String network_usage) {
+    public void setNetwork_usage(long network_usage) {
         this.network_usage = network_usage;
     }
 
@@ -45,7 +45,7 @@ public class DockerStats {
         return "DockerStats{" +
                 "usage_memory=" + usageMemory +
                 ", cpu_usage=" + cpu_usage +
-                ", network_usage='" + network_usage + '\'' +
+                ", network_usage= " + network_usage +
                 '}';
     }
 }

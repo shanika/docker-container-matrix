@@ -32,11 +32,13 @@ public class PrintJob extends QuartzJobBean {
         // update back to next job execute
         jobExecutionContext.getJobDetail().getJobDataMap().put(PREV_TOTAL, cpuUsage.getPrevTotal());
         jobExecutionContext.getJobDetail().getJobDataMap().put(PREV_IDLE, cpuUsage.getPrevIdle());
-        //
+        // cpu usage
         DockerStats dockerStats = new DockerStats();
         dockerStats.setCpu_usage(DoubleRounder.round(cpuUsage.getPercent(), 2));
         dockerStats.setUsageMemory(usageMemory);
-        dockerStats.setNetwork_usage("");
+        // network usage
+        long networkStats = dockerService.getNetworkStats();
+        dockerStats.setNetwork_usage(networkStats / (1024 * 1024));
         System.out.println(dockerStats);
     }
 }

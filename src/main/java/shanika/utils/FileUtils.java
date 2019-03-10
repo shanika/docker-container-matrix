@@ -3,6 +3,8 @@ package shanika.utils;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -110,6 +112,66 @@ public class FileUtils {
             // return null to indicate failure
         }
         return null;
+    }
+
+    /**
+     * Read text file as {@link String}
+     * @param file {@link File}
+     * @return file contents as string
+     * @throws IOException
+     */
+    public static String readTextFileAsString(File file) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        StringBuilder builder = new StringBuilder();
+        String temp = null;
+        try{
+            while((temp=reader.readLine())!=null) {
+                builder.append(temp+"\n");
+            }
+        }finally{
+            reader.close();
+        }
+        return builder.toString();
+    }
+
+    /**
+     * Read text file as {@link String}
+     * @param fileName or path to file
+     * @return file contents as string
+     * @throws IOException
+     */
+    public static String readTextFileAsString(String fileName) throws IOException {
+        return readTextFileAsString(new File(fileName));
+    }
+
+    /**
+     * Read text file as {@link String}
+     * @param file {@link File}
+     * @return file contents as {@link List}
+     * @throws IOException
+     */
+    public static List<String> readTextFileAsList(File file) throws IOException {
+        List<String> lines = new ArrayList<String>();
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        String temp = null;
+        try{
+            while((temp=reader.readLine())!=null) {
+                lines.add(temp);
+            }
+        }finally{
+            reader.close();
+        }
+        return lines;
+    }
+
+    /**
+     * Read text file as {@link String}
+     * @param fileName or path to file
+     * @return file contents as {@link List}
+     * @throws IOException
+     */
+    public static List<String> readTextFileAsList(String fileName) throws IOException {
+        return readTextFileAsList(new File(fileName));
     }
 
 }

@@ -26,6 +26,8 @@ public interface DockerService {
     Pattern CPU_JIFFIES_PATTERN =
             Pattern.compile("cpu\\s+(.*)", Pattern.MULTILINE);
 
+    String NETWORK_STATS = "/proc/net/dev";
+
 
     /**
      * Get Current Docker version
@@ -60,5 +62,5 @@ public interface DockerService {
 
     CpuStats getCpuUsage(long prevTotal, long prevIdle);
 
-    ArrayList<String> gatherNetworkUsage();
+    long getNetworkStats();
 }

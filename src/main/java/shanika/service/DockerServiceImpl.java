@@ -8,14 +8,11 @@ import com.spotify.docker.client.messages.Version;
 import org.springframework.stereotype.Service;
 import shanika.dto.CpuStats;
 import shanika.dto.DockerStats;
+import shanika.dto.NetDeviceUsage;
+import shanika.utils.FileUtils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -60,10 +57,10 @@ public class DockerServiceImpl implements DockerService {
         long free = Long.parseLong(freeMemory) * 1024;
 
         String buffersMemory = fileUtils.runRegexOnFile(BUFFERS_MEMORY_PATTERN, "/proc/meminfo");
-        long buffers = Long.parseLong(freeMemory) * 1024;
+        long buffers = Long.parseLong(buffersMemory) * 1024;
 
         String cachedMemory = fileUtils.runRegexOnFile(CACHED_MEMORY_PATTERN, "/proc/meminfo");
-        long cached = Long.parseLong(freeMemory) * 1024;
+        long cached = Long.parseLong(cachedMemory) * 1024;
 
         // Used memory (calculated as total - free - buffers - cache)
         long usageMemory = total - free - buffers - cached;
@@ -95,24 +92,27 @@ public class DockerServiceImpl implements DockerService {
     }
 
     @Override
-    public ArrayList<String> gatherNetworkUsage() {
-        final ArrayList<String> data = new ArrayList<String>();
-        String[] tempData;
-        String[] tempFile;
+    public long getNetworkStats() {
+        long networkUsage = 0;
+        try {
+            List<String> lines = FileUtils.readTextFileAsList(NETWORK_STATS);
+            List<NetDeviceUsage> devices = new ArrayList<>();
+            for (int i = 2; i < lines.size(); i++) {
+                devices.add(computeNDeviceUsage(lines.get(i)));
+            }
+            // cumulative
+            if (devices.isEmpty()) {
+                return 0;
+            }
 
-        tempFile = getContents("/proc/net/dev").split(
-                System.getProperty("line.separator"));
-        // Skip the first two lines (headers)
-        for (int i = 2; i < tempFile.length; i++) {
-            // Parse /proc/net/dev to obtain network statistics.
-            // Line e.g.:
-            // lo: 4852 43 0 0 0 0 0 0 4852 43 0 0 0 0 0 0
-            tempData = tempFile[i].replace(":", " ").split(
-                    " ");
-            data.addAll(Arrays.asList(tempData));
-            data.removeAll(Collections.singleton(""));
+            for (NetDeviceUsage netDeviceUsage : devices) {
+                networkUsage += netDeviceUsage.getTxBytes();
+            }
+            return networkUsage;
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return data;
+        return networkUsage;
     }
 
     private DockerStats getContainerStats(ContainerStats containerStats) {
@@ -130,37 +130,32 @@ public class DockerServiceImpl implements DockerService {
 //        return new DockerStats(DoubleRounder.round(percent, 2), memoryUsage, networkUsage);
     }
 
-    private String getContents(String path) {
-        // ...checks on aFile are elided
-        final StringBuilder contents = new StringBuilder();
+    public static NetDeviceUsage computeNDeviceUsage(String deviceLine) {
+        NetDeviceUsage device = new NetDeviceUsage();
+        String[] splits = deviceLine.split("\\s+");
 
-        try {
-            // use buffering, reading one line at a time
-            // FileReader always assumes default encoding is OK!
-            final BufferedReader input = new BufferedReader(new FileReader(
-                    new File(path)));
-            try {
-                String line; // not declared within while loop
-                /*
-                 * readLine is a bit quirky : it returns the content of a line
-                 * MINUS the newline. it returns null only for the END of the
-                 * stream. it returns an empty String if two newlines appear in
-                 * a row.
-                 */
-                while ((line = input.readLine()) != null) {
-                    contents.append(line);
-                    contents.append(System.getProperty("line.separator"));
-                }
-            } finally {
-                input.close();
+        device.setDeviceName(splits[1].replace(":", ""));
 
-            }
-        } catch (final IOException ex) {
-            ex.printStackTrace();
+        device.setRxBytes(Long.parseLong(splits[2]));
+        device.setRxPackets(Long.parseLong(splits[3]));
+        device.setRxErrs(Long.parseLong(splits[4]));
+        device.setRxDrop(Long.parseLong(splits[5]));
+        device.setRxFifo(Long.parseLong(splits[6]));
+        device.setRxframe(Long.parseLong(splits[7]));
+        device.setRxCompressed(Long.parseLong(splits[8]));
+        device.setRxMultiCast(Long.parseLong(splits[9]));
+
+        device.setTxBytes(Long.parseLong(splits[10]));
+        device.setTxPackets(Long.parseLong(splits[11]));
+        device.setTxErrs(Long.parseLong(splits[12]));
+        device.setTxDrop(Long.parseLong(splits[13]));
+        device.setTxFifo(Long.parseLong(splits[14]));
+        device.setTxColls(Long.parseLong(splits[15]));
+        device.setTxCarrier(Long.parseLong(splits[16]));
+        if (splits.length >= 18) {
+            device.setTxCompressed(Long.parseLong(splits[17]));
         }
 
-        return contents.toString();
+        return device;
     }
-
-
 }
