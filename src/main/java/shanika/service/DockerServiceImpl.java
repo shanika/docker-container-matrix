@@ -106,7 +106,7 @@ public class DockerServiceImpl implements DockerService {
             }
 
             for (NetDeviceUsage netDeviceUsage : devices) {
-                networkUsage += netDeviceUsage.getTxBytes();
+                networkUsage += (netDeviceUsage.getRxBytes() + netDeviceUsage.getTxBytes());
             }
             return networkUsage;
         } catch (IOException e) {

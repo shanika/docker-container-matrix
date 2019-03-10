@@ -38,7 +38,7 @@ public class PrintJob extends QuartzJobBean {
         dockerStats.setUsageMemory(usageMemory);
         // network usage
         long networkStats = dockerService.getNetworkStats();
-        dockerStats.setNetwork_usage(networkStats / (1024 * 1024));
+        dockerStats.setNetwork_usage(networkStats / (1024));
         System.out.println(dockerStats);
     }
 }
